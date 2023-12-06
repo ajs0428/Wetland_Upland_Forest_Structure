@@ -148,3 +148,7 @@ autoplot(pc, data = (myData[, c(-6)]), colour = "wetupl", loadings = TRUE, loadi
 
 
 upl_metrics <- cloud_metrics(upl_ctg, func = .stdmetrics_z) 
+
+
+
+#######

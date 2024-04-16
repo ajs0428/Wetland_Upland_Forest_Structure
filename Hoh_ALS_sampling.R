@@ -15,12 +15,11 @@ hoh_poly <- vect("SOIL CARBON/SPATIAL LAYERS/SPATIAL_LAYERS_7_11_22/HOH/HOH_POLY
 GEE_HOHTCCproj <- rast("AGB/HOH/GEE_hohTCC.tif_proj.tif")
 rip <- vect("NHD_surfacewater/NHD_H_17100101_HU8_Shape/Shape/NHDFlowline.shp") |> project(hoh_poly)
 hoh_rip <- crop(rip, hoh_poly)
-hoh_rip_fil <- hoh_rip |> tidyterra::filter(visibility > 0) |> terra::buffer(15.24)
+hoh_rip_fil <- vect("Wetland_Upland_Forest_Structure/data/hoh_rip_fil")#hoh_rip |> tidyterra::filter(visibility > 0) |> terra::buffer(15.24)
 
 hoh_WIPwf <- hoh_WIPw |> mask(GEE_HOHTCCproj >=50, maskvalues = 0, updatevalue = NA) |>
     mask(hoh_rip_fil, inverse = T, updatevalue = NA)
 plot(hoh_WIPwf)
-
 
 m <- c(FALSE, 0,
        TRUE, 1)
@@ -30,7 +29,7 @@ plot(rc1)
 
 agFunc <- function(x) {sum(x*c(rep(0,2380),1,rep(0,2380)))}
 
-hoh_WIPwf_agg <- terra::aggregate(rc1, 69, fun = agFunc) # Aggregate to coarser resolution to avoid spatial autocorrelation
+hoh_WIPwf_agg <- terra::aggregate(rc1, 69, fun = agFunc, filename = "Wetland_Upland_Forest_Structure/data/hoh_wip_binary_agg.tif") # Aggregate to coarser resolution to avoid spatial autocorrelation
 plot(hoh_WIPwf_agg)
 
 # create sample points from severity
@@ -54,20 +53,24 @@ all_pnts_prj <- all_pnts_prj |> mutate(wetup = case_when(WET == 1 ~ "WET",
                                                          .default = "other"))
 
 plot(all_pnts_prj)
-
-# all_pnts_buff <- all_pnts |> sf::st_buffer(20) 
-# plot(all_pnts_buff, type = "polygons")
-
-# wf_pts <- spatSample(hoh_WIPwf, 1000, method="random", replace=FALSE, na.rm=TRUE, 
-#            as.raster=FALSE, as.df=FALSE, as.points=TRUE, values=TRUE, cells=FALSE, 
-#            xy=TRUE, ext=NULL, warn=TRUE, weights=NULL,  exp=5, exhaustive=FALSE)
+all_pnts_prj_4326 <- st_transform(all_pnts_prj, "EPSG:4326")
+writeVector(vect(all_pnts_prj_4326), "Wetland_Upland_Forest_Structure/data/all_pnts_prj_4326/all_pnts_prj_4326.shp")
 
 
-#ctg <- readLAScatalog("Lidar/hoh_all_pcs/datasetsA/")
-#plot(ctg)
-#ctg_poly <- ctg |> st_as_sf() |> sf::st_union()
-# st_crs(ctg_poly) <- 2927
-#st_crs(ctg) <- 2927
+
+all_pnts_buff <- all_pnts |> sf::st_buffer(20)
+plot(all_pnts_buff, type = "polygons")
+
+wf_pts <- spatSample(hoh_WIPwf, 1000, method="random", replace=FALSE, na.rm=TRUE,
+           as.raster=FALSE, as.df=FALSE, as.points=TRUE, values=TRUE, cells=FALSE,
+           xy=TRUE, ext=NULL, warn=TRUE, weights=NULL,  exp=5, exhaustive=FALSE)
+
+
+ctg <- readLAScatalog("Lidar/hoh_all_pcs/datasetsA/")
+plot(ctg)
+ctg_poly <- ctg |> st_as_sf() |> sf::st_union()
+st_crs(ctg_poly) <- 2927
+st_crs(ctg) <- 2927
 
 
 
@@ -152,3 +155,6 @@ upl_metrics <- cloud_metrics(upl_ctg, func = .stdmetrics_z)
 
 
 #######
+
+test <- readLAS("Lidar/hoh_all_pcs/processing/hoh_799099.3_940639.6.laz")
+plot(test)

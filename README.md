@@ -1,13 +1,15 @@
-## Investigation of the differences between closed-canopy forested wetlands and uplands in the PNW
+## Identifying unique closed-canopy forested wetlands as critical conservation targets
 
 Soil saturation and inundation are key characteristics of wetlands and can promote the accumulation of soil organic carbon
 while inhibiting plant productivity. However, some forested wetlands can maintain high productivity, exhibiting thick closed canopies
 which attain significant aboveground biomass such that they are indistinguishable from the surrounding upland forest. These 
 closed-canopy forested wetlands (CCFW) may appear similar to forested uplands but soil saturation and inundation may alter 
 patterns of tree growth (leaf-stem ratio?, thick crowns?) through repeated stress events. This potential change in forest structure development
-may provide unique forest structure that can serve as important habitat niches. 
+may provide unique forest structure that improves forest structural diversity by representing important habitat niches. 
 
+CCFWs can potentially fulfill critically important conservation aspects: unique habitat, aboveground biomass carbon storage, and belowground soil carbon storage. It is imperative to assess the potential importance of CCFW ecosystems and to develop protocols for identification.
 
-Two questions need to be addressed:
-1. Is the forest structure of closed-canopy forested wetlands similar to upland forests?
-2. Do closed canopy forested wetlands contain similar aboveground biomass compared to upland forests? 
+Questions to be addressed:
+1. Is the forest structure of CCFW similar to upland forest?
+2. Does CCFW contain similar aboveground biomass compared to upland forest?
+   2a. What is the total carbon stock of CCFW compared to FW?

@@ -9,6 +9,8 @@ may provide unique forest structure that improves forest structural diversity by
 
 CCFWs can potentially fulfill critically important conservation aspects: unique habitat, aboveground biomass carbon storage, and belowground soil carbon storage. It is imperative to assess the potential importance of CCFW ecosystems and to develop protocols for identification.
 
+Some forests are also wetlands [cite the forested wetlands paper]. How does wetland status affect forest structure and function? Possibly, wetland forests have unique structure that increases their functional diversity and carbon sequestration.
+
 Questions to be addressed:
 1. Is the forest structure of CCFW similar to upland forest?
 2. Does CCFW contain similar aboveground biomass compared to upland forest?

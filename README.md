@@ -1,4 +1,4 @@
-## Identifying unique closed-canopy forested wetlands as critical conservation targets
+## Closed-canopy forested wetlands as critical conservation targets
 
 Soil saturation and inundation are key characteristics of wetlands and can promote the accumulation of soil organic carbon
 while inhibiting plant productivity. However, some forested wetlands can maintain high productivity, exhibiting thick closed canopies

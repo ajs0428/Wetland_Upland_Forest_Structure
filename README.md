@@ -12,4 +12,4 @@ CCFWs can potentially fulfill critically important conservation aspects: unique 
 Questions to be addressed:
 1. Is the forest structure of CCFW similar to upland forest?
 2. Does CCFW contain similar aboveground biomass compared to upland forest?
-   2a. What is the total carbon stock of CCFW compared to FW?
+3.    What is the total carbon stock of CCFW compared to FW?

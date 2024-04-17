@@ -1,3 +1,8 @@
+## Navigation
+The `Hoh_ALS_sampling.R` script has sampled 15m radius point clouds from the Hoh. Part of the script also contains code to process metrics but it is a bit messy. I didn't save point clouds according to wetland or upland status so the `wetupl_table_for_ptclouds.csv` shows which ones are which. 
+
+Point clouds are in a zipped folder called `hoh_ptclouds.zip` on here.
+
 ## Closed-canopy forested wetlands as critical conservation targets
 
 Soil saturation and inundation are key characteristics of wetlands and can promote the accumulation of soil organic carbon

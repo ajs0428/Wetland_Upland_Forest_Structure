@@ -19,7 +19,7 @@ hoh_rip_fil <- vect("Wetland_Upland_Forest_Structure/data/hoh_rip_fil")#hoh_rip 
 
 hoh_WIPwf <- hoh_WIPw |> mask(GEE_HOHTCCproj >=50, maskvalues = 0, updatevalue = NA) |>
     mask(hoh_rip_fil, inverse = T, updatevalue = NA)
-plot(hoh_WIPwf)
+plot(hoh_WIPwf, main = "hoh_WIPwf - wet forest")
 
 m <- c(FALSE, 0,
        TRUE, 1)
@@ -29,7 +29,8 @@ plot(rc1)
 
 agFunc <- function(x) {sum(x*c(rep(0,2380),1,rep(0,2380)))}
 
-hoh_WIPwf_agg <- terra::aggregate(rc1, 69, fun = agFunc, filename = "Wetland_Upland_Forest_Structure/data/hoh_wip_binary_agg.tif") # Aggregate to coarser resolution to avoid spatial autocorrelation
+hoh_WIPwf_agg <- terra::aggregate(rc1, 69, fun = agFunc, filename = "Wetland_Upland_Forest_Structure/data/hoh_wip_binary_agg.tif",
+                                  overwrite = T) # Aggregate to coarser resolution to avoid spatial autocorrelation
 plot(hoh_WIPwf_agg)
 
 # create sample points from severity
@@ -43,7 +44,7 @@ upl_pnts <- pnts[pnts$WET < 0.5, ] |>
 
 
 all_pnts <- rbind(wet_pnts, upl_pnts)
-plot(wet_pnts)
+plot(all_pnts)
 
 wet_pnts_prj <- st_transform(wet_pnts, "EPSG:2927")
 upl_pnts_prj <- st_transform(upl_pnts, "EPSG:2927")
@@ -52,19 +53,20 @@ all_pnts_prj <- all_pnts_prj |> mutate(wetup = case_when(WET == 1 ~ "WET",
                                                          WET == 0 ~ "UPL",
                                                          .default = "other"))
 
-plot(all_pnts_prj)
+plot(all_pnts_prj["wetup"])
 all_pnts_prj_4326 <- st_transform(all_pnts_prj, "EPSG:4326")
-writeVector(vect(all_pnts_prj_4326), "Wetland_Upland_Forest_Structure/data/all_pnts_prj_4326/all_pnts_prj_4326.shp")
+writeVector(vect(all_pnts_prj_4326), "Wetland_Upland_Forest_Structure/data/all_pnts_prj_4326/all_pnts_prj_4326.shp",
+            overwrite = T)
 
 
 
 all_pnts_buff <- all_pnts |> sf::st_buffer(20)
-plot(all_pnts_buff, type = "polygons")
+plot(all_pnts_buff)
 
 wf_pts <- spatSample(hoh_WIPwf, 1000, method="random", replace=FALSE, na.rm=TRUE,
            as.raster=FALSE, as.df=FALSE, as.points=TRUE, values=TRUE, cells=FALSE,
            xy=TRUE, ext=NULL, warn=TRUE, weights=NULL,  exp=5, exhaustive=FALSE)
-
+plot(wf_pts)
 
 ctg <- readLAScatalog("Lidar/hoh_all_pcs/datasetsA/")
 plot(ctg)
@@ -81,11 +83,13 @@ st_crs(ctg) <- 2927
 
 opt_output_files(ctg) <- "/Users/Anthony/OneDrive - UW/University of Washington/Data and Modeling/Lidar/hoh_all_pcs/processing/hoh_{XCENTER}_{YCENTER}"
 opt_laz_compression(ctg) <- TRUE
-opt_merge(ctg) = TRUE
+opt_merge(ctg) = FALSE
 
-wet_ctg <- clip_roi(ctg, wet_pnts_prj, radius = 49.2) #15m radius, 30m pixel
-upl_ctg <- clip_roi(ctg, upl_pnts_prj, radius = 49.2) #15m radius, 30m pixel
-plot(readLAS(upl_ctg$filename[1]))
+all_ctg <- clip_roi(ctg, all_pnts_prj, radius = 49.2) #15m radius, 30m pixel
+#wet_ctg <- clip_roi(ctg, wet_pnts_prj, radius = 49.2) #15m radius, 30m pixel
+#upl_ctg <- clip_roi(ctg, upl_pnts_prj, radius = 49.2) #15m radius, 30m pixel
+plot(readLAS(all_ctg$filename[70])) #test
+
 
 
 wet_list <- list()

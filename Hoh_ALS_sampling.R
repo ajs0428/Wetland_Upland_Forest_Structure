@@ -19,7 +19,10 @@ hoh_rip_fil <- vect("Wetland_Upland_Forest_Structure/data/hoh_rip_fil")#hoh_rip 
 
 hoh_WIPwf <- hoh_WIPw |> mask(GEE_HOHTCCproj >=50, maskvalues = 0, updatevalue = NA) |>
     mask(hoh_rip_fil, inverse = T, updatevalue = NA)
+hoh_WIPwf_2927 <- terra::project(hoh_WIPwf, "EPSG:2927")
 plot(hoh_WIPwf, main = "hoh_WIPwf - wet forest")
+
+
 
 m <- c(FALSE, 0,
        TRUE, 1)
@@ -33,7 +36,7 @@ hoh_WIPwf_agg <- terra::aggregate(rc1, 69, fun = agFunc, filename = "Wetland_Upl
                                   overwrite = T) # Aggregate to coarser resolution to avoid spatial autocorrelation
 plot(hoh_WIPwf_agg)
 
-# create sample points from severity
+# create sample points from aggregated raster
 pnts <- st_as_sf(as.points(hoh_WIPwf_agg))
 plot(pnts)
 
@@ -58,8 +61,6 @@ all_pnts_prj_4326 <- st_transform(all_pnts_prj, "EPSG:4326")
 writeVector(vect(all_pnts_prj_4326), "Wetland_Upland_Forest_Structure/data/all_pnts_prj_4326/all_pnts_prj_4326.shp",
             overwrite = T)
 
-
-
 all_pnts_buff <- all_pnts |> sf::st_buffer(20)
 plot(all_pnts_buff)
 
@@ -74,13 +75,6 @@ ctg_poly <- ctg |> st_as_sf() |> sf::st_union()
 st_crs(ctg_poly) <- 2927
 st_crs(ctg) <- 2927
 
-
-
-#small_pnts_prj <- st_crop(all_pnts_prj, ctg_poly)
-
-#x <- sf::st_coordinates(small_pnts_prj)[,1]
-#y <- sf::st_coordinates(small_pnts_prj)[,2]
-
 opt_output_files(ctg) <- "/Users/Anthony/OneDrive - UW/University of Washington/Data and Modeling/Lidar/hoh_all_pcs/processing/hoh_{XCENTER}_{YCENTER}"
 opt_laz_compression(ctg) <- TRUE
 opt_merge(ctg) = FALSE
@@ -88,10 +82,36 @@ opt_merge(ctg) = FALSE
 all_ctg <- clip_roi(ctg, all_pnts_prj, radius = 49.2) #15m radius, 30m pixel
 #wet_ctg <- clip_roi(ctg, wet_pnts_prj, radius = 49.2) #15m radius, 30m pixel
 #upl_ctg <- clip_roi(ctg, upl_pnts_prj, radius = 49.2) #15m radius, 30m pixel
-plot(readLAS(all_ctg$filename[70])) #test
+(readLAS(all_ctg$filename[70])) #test
 
+pc_filelist <- list.files("Lidar/hoh_all_pcs/processing/", pattern = ".laz")
 
+pc_pt_func <- function(filelist){
+    pc_mat <- matrix(nrow = length(filelist), ncol = 3)
+    for (i in 1:length(filelist)){
+        pc_mat[i, 1] = i
+        pc_mat[i, 2] = stringr::str_extract(filelist[i], "(?<=_)[^_]+(?=_)")
+        pc_mat[i, 3] = stringr::str_extract(filelist[i], "(?<=_)[^_]+(?=.laz)")
+    }
+    pc_dat <- as.data.frame(pc_mat)
+    colnames(pc_dat) <- c("n", "x", "y")
+    pc_dat <- pc_dat |> mutate(x = as.numeric(x),
+                                y = as.numeric(y))
+    pc_vect <- vect(pc_dat, geom = c("x", "y"), crs = "EPSG:2927", keepgeom = TRUE)
+    return(pc_vect)
+}
 
+hoh_pc_pts <- pc_pt_func(pc_filelist) |> 
+    terra::extract(x = hoh_WIPwf_2927, bind = TRUE) |> 
+    mutate(wetup = case_when(WET >= 0.5 ~ "WET",
+                             WET < 0.5 ~ "UPL",
+                             .default = "other"))
+
+wetupl_table <- data.frame(pc_filelist) |> cbind(hoh_pc_pts$wetup) |> 
+    dplyr::rename(wetup = `hoh_pc_pts$wetup`)
+wetupl_table |> group_by(wetup) |> tally()
+
+#---------------------------------------------------------------------------------------
 wet_list <- list()
 for (i in c(1:length(wet_ctg))){
     #print(i)

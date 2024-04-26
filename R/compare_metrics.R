@@ -1,4 +1,5 @@
 library(dplyr)
+library(tibble)
 library(readr)
 library(ggplot2)
 library(foreach)
@@ -43,6 +44,16 @@ metrics_scale <- metric_df %>%
 
 # 100% of first returns are above 2f in all clouds so ignore that column
 metric_pca <- princomp(metrics_scale)
+summary(metric_pca)
+metric_pca$loadings[,1:2]  |> data.frame() |> rownames_to_column(var = "metric") |>
+    ggplot(aes(x = metric, y = abs(Comp.1))) +
+    geom_col() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+metric_pca$loadings[,1:2]  |> data.frame() |> rownames_to_column(var = "metric") |>
+    ggplot(aes(x = metric, y = abs(Comp.2))) +
+    geom_col() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 metric_df$PCA1 <- metric_pca$scores[, 1]
 metric_df$PCA2 <- metric_pca$scores[, 2]
